@@ -80,9 +80,9 @@ By installing this software you agree to the [EULA](EULA.md).
 
 ## Support
 
-- **Email**: <support@techcon-solution.example>  *(replace with real contact)*
+- **Email**: info@techcon-solution.com
 - **Issue tracker**: GitHub Issues on this repo for installation / docs questions
-- **Security disclosure**: <security@techcon-solution.example>  *(replace with real contact)*
+- **Security disclosure**: info@techcon-solution.com
 
 ## Releases
 
