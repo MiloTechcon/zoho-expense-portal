@@ -1,0 +1,18 @@
+# Customer secrets — never commit these
+.env
+.env.local
+*.pem
+
+# License token (if exported for inspection)
+license-token.txt
+dev-license.txt
+
+# Branding overrides bind-mount target
+logo-overrides/
+
+# Docker compose override (used for per-host port mapping etc)
+docker-compose.override.yml
+
+# OS noise
+.DS_Store
+Thumbs.db

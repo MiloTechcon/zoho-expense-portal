@@ -1,0 +1,78 @@
+# =============================================================================
+# Zoho Expense Portal — Customer compose template
+#
+# This file is a TEMPLATE. Copy it next to your .env as `docker-compose.yml`
+# and edit only if your environment needs extra overrides (e.g. port mappings).
+#
+# - Pin the image version in `.env` via APP_VERSION_TAG (e.g. v1.4).
+#   Never replace the ${APP_VERSION_TAG} placeholder with `:latest` — pinned
+#   versions are required for licensing, reproducibility, and rollback.
+# - To run with a Cloudflare tunnel:  docker compose --profile cloudflare up -d
+# - To run without a tunnel:          docker compose up -d
+# =============================================================================
+
+services:
+  web:
+    image: ghcr.io/milotechcon/zoho-expense-portal:${APP_VERSION_TAG}
+    command: python /app/run_web.py
+    env_file: .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logo-overrides:/app/app/static/custom:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  worker:
+    image: ghcr.io/milotechcon/zoho-expense-portal:${APP_VERSION_TAG}
+    command: python /app/run_worker.py
+    env_file: .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+      SCAN_ROOT: /scans
+      SCAN_DEFAULT_USERNAME: ${SCAN_DEFAULT_USERNAME:-scanner}
+      SCAN_STABILITY_SECONDS: ${SCAN_STABILITY_SECONDS:-3}
+      SCAN_MAX_PER_TICK: ${SCAN_MAX_PER_TICK:-10}
+    volumes:
+      - ${SCAN_HOST_DIR:-/tmp/zoho-scans}:/scans
+      - ./logo-overrides:/app/app/static/custom:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: expenses
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles: ["cloudflare"]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  pgdata:

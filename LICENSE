@@ -1,0 +1,9 @@
+PROPRIETARY SOFTWARE — see EULA.md.
+
+The Zoho Expense Portal software (the "Software") and its associated Docker
+image are proprietary works of Techcon Solution (Hong Kong) and are licensed,
+not sold. Use of the Software is subject to the End User License Agreement
+in EULA.md in this repository.
+
+This LICENSE file exists only to keep tooling that expects a top-level LICENSE
+happy. The binding terms are in EULA.md.
