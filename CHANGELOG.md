@@ -6,6 +6,20 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
+## v1.4-saas — 2026-05-20
+
+**First production SaaS release.** Same build content as `v1.4-saas-pilot.2`, promoted after a successful internal pilot. This is the tag to pin in `.env`.
+
+- Multi-arch image (linux/amd64 + linux/arm64); native pulls on Apple Silicon and ARM cloud hosts
+- Licence-key enforcement at boot (web + worker); no phone-home
+- Customer install script `install.sh` with `--update` / `--check` modes
+- Brand customisation via `BRAND_NAME` / `BRAND_LOGO_URL` env vars
+- Image source is compiled — no readable Python from `app/` or `worker/` ships in the image
+
+For deployment engineers: see [ONSITE_DEPLOYMENT.md](ONSITE_DEPLOYMENT.md) for the step-by-step playbook and [DEPLOYMENT_GUIDE_ENGINEERS.md](DEPLOYMENT_GUIDE_ENGINEERS.md) for the operational reference.
+
+---
+
 ## v1.4-saas-pilot.2 — 2026-05-19
 
 **Pilot release** — first customer-self-hosted distribution.
