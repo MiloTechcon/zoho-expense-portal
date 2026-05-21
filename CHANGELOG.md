@@ -6,9 +6,22 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
+## v1.4.1-saas — 2026-05-20  *(current — recommended to pin)*
+
+Footer version label now correctly shows `v1.4` (the previous build had `v1.2` baked in by accident). No other changes — same features, same security posture, same multi-arch image as `v1.4-saas`.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.1-saas
+bash install.sh --update
+```
+
+---
+
 ## v1.4-saas — 2026-05-20
 
-**First production SaaS release.** Same build content as `v1.4-saas-pilot.2`, promoted after a successful internal pilot. This is the tag to pin in `.env`.
+**First production SaaS release.** Superseded by `v1.4.1-saas` (cosmetic version-label fix). New deployments should pin `v1.4.1-saas` instead.
 
 - Multi-arch image (linux/amd64 + linux/arm64); native pulls on Apple Silicon and ARM cloud hosts
 - Licence-key enforcement at boot (web + worker); no phone-home
@@ -20,15 +33,9 @@ For deployment engineers: see [ONSITE_DEPLOYMENT.md](ONSITE_DEPLOYMENT.md) for t
 
 ---
 
-## v1.4-saas-pilot.2 — 2026-05-19
+## Pilot iterations *(no longer available)*
 
-**Pilot release** — first customer-self-hosted distribution.
-
-- Multi-arch Docker image (linux/amd64 + linux/arm64). Apple Silicon Macs, Raspberry Pi, and ARM cloud instances now pull native binaries.
-- License-key enforcement at boot. Worker and web both refuse to start without a valid `LICENSE_KEY`.
-- Customer install script (`install.sh`) handles prereq checks, GHCR login, image pull, container start, and `/health` wait.
-- Brand customisation via `BRAND_NAME` and `BRAND_LOGO_URL` env vars.
-- Image source is **compiled** (no readable Python from `app/` or `worker/` ships in the image).
+Tags `v1.4-saas-pilot`, `v1.4-saas-pilot.1`, and `v1.4-saas-pilot.2` were internal pilot iterations that produced the production builds above. Their images and git tags have been removed; they are not pullable.
 
 ## What's inside, feature-wise (carried forward from prior releases)
 
