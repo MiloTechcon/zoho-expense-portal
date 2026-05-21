@@ -6,22 +6,45 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.1-saas — 2026-05-20  *(current — recommended to pin)*
+## v1.4.2-saas — 2026-05-21  *(current — recommended to pin)*
 
-Footer version label now correctly shows `v1.4` (the previous build had `v1.2` baked in by accident). No other changes — same features, same security posture, same multi-arch image as `v1.4-saas`.
+Admin CLI is now reachable inside the compiled image. Previous tags required a Python one-liner workaround because Nuitka-compiled modules don't support `python -m`. A small `run_manage.py` launcher fixes this.
+
+User management now works as documented:
+
+```bash
+docker compose exec web python /app/run_manage.py create-user <name>
+docker compose exec web python /app/run_manage.py list-users
+docker compose exec web python /app/run_manage.py set-password <name>
+docker compose exec web python /app/run_manage.py delete-user <name>
+```
 
 Apply with:
 
 ```bash
-# In .env:  APP_VERSION_TAG=v1.4.1-saas
+# In .env:  APP_VERSION_TAG=v1.4.2-saas
 bash install.sh --update
 ```
 
 ---
 
+## v1.4.1-saas — 2026-05-20
+
+Footer version label now correctly shows `v1.4` (the previous build had `v1.2` baked in by accident). No other changes — same features, same security posture, same multi-arch image as `v1.4-saas`.
+
+**Known issue (resolved in v1.4.2-saas):** `docker compose exec web python -m app.manage ...` fails with `AttributeError: type object 'nuitka_module_loader' has no attribute 'get_code'`. Workaround:
+
+```bash
+docker compose exec web python -c "import sys; from app.manage import main; sys.exit(main(['manage','create-user','<name>']))"
+```
+
+New deployments should pin `v1.4.2-saas` instead.
+
+---
+
 ## v1.4-saas — 2026-05-20
 
-**First production SaaS release.** Superseded by `v1.4.1-saas` (cosmetic version-label fix). New deployments should pin `v1.4.1-saas` instead.
+**First production SaaS release.** Superseded by `v1.4.2-saas`. New deployments should pin `v1.4.2-saas` instead.
 
 - Multi-arch image (linux/amd64 + linux/arm64); native pulls on Apple Silicon and ARM cloud hosts
 - Licence-key enforcement at boot (web + worker); no phone-home

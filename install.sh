@@ -8,7 +8,7 @@
 #
 # Required env (read from .env if present, else prompted):
 #   LICENSE_KEY                  signed by Techcon Solution
-#   APP_VERSION_TAG              e.g. v1.4-saas-pilot.1   (NEVER :latest)
+#   APP_VERSION_TAG              e.g. v1.4.2-saas   (NEVER :latest)
 #   GHCR_USERNAME                your GitHub username
 #   GHCR_PAT                     personal access token, scope read:packages
 #   ZOHO_CLIENT_ID
@@ -110,7 +110,7 @@ if [[ "$MODE" == "install" ]]; then
     say "Configuration (anything blank will be prompted)"
 
     prompt_var LICENSE_KEY        "LICENSE_KEY (provided by Techcon)" "" secret
-    prompt_var APP_VERSION_TAG    "Image tag" "v1.4-saas-pilot.1"
+    prompt_var APP_VERSION_TAG    "Image tag" "v1.4.2-saas"
     prompt_var GHCR_USERNAME      "GitHub username (for docker login)"
     prompt_var GHCR_PAT           "GitHub PAT (read:packages)" "" secret
     prompt_var ZOHO_CLIENT_ID     "ZOHO_CLIENT_ID"
@@ -236,7 +236,7 @@ ok "Deployment complete."
 echo
 echo "Next steps:"
 echo "  • Web UI:          http://localhost:8000"
-echo "  • Create a user:   docker compose exec web python -m app.manage create-user <name>"
+echo "  • Create a user:   docker compose exec web python /app/run_manage.py create-user <name>"
 echo "  • Tail worker:     docker compose logs -f worker"
 echo "  • Update later:    bash install.sh --update"
 echo "  • Reconfigure:     edit .env then rerun without flags"

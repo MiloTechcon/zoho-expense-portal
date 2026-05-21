@@ -93,7 +93,7 @@ On success you'll see:
 
 Next steps:
   • Web UI:          http://localhost:8000
-  • Create a user:   docker compose exec web python -m app.manage create-user <name>
+  • Create a user:   docker compose exec web python /app/run_manage.py create-user <name>
   • Tail worker:     docker compose logs -f worker
   • Update later:    bash install.sh --update
 ```
@@ -101,7 +101,7 @@ Next steps:
 ## 6. Create your first user
 
 ```bash
-docker compose exec web python -m app.manage create-user director1
+docker compose exec web python /app/run_manage.py create-user director1
 # Prompts for a password (min 8 chars)
 ```
 

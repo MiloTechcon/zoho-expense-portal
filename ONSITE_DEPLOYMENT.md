@@ -184,13 +184,13 @@ You'll see `[license] valid for 'Customer Co Ltd', exp=…` near the end.
 ## 7. Create the first user (2 min)
 
 ```bash
-docker compose exec web python -m app.manage create-user director1
+docker compose exec web python /app/run_manage.py create-user director1
 # Prompts for a password (min 8 chars). The customer types it; you don't see it.
 ```
 
 Repeat for each director / staff member who will use the portal.
 
-**Check:** `docker compose exec web python -m app.manage list-users` shows the new users.
+**Check:** `docker compose exec web python /app/run_manage.py list-users` shows the new users.
 
 ---
 
@@ -260,7 +260,7 @@ If the customer has a Kodak S2080W or any scanner that outputs to a folder:
 3. Create the scanner user:
 
    ```bash
-   docker compose exec web python -m app.manage create-user scanner
+   docker compose exec web python /app/run_manage.py create-user scanner
    ```
 
 4. Apply the change:
