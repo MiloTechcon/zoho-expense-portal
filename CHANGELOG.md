@@ -6,7 +6,49 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.6-saas — 2026-05-28  *(current — recommended to pin)*
+## v1.4.7-saas — 2026-05-29  *(current — recommended to pin)*
+
+Empty-extraction guard. Three layers of protection against blank or unreadable scans polluting history by auto-linking to wrong Zoho expenses.
+
+**Layer 1 — scanner pre-OCR size guard.** Files smaller than `MIN_RECEIPT_SIZE_BYTES` (default 5 KB) move to the source folder's `_failed/` archive with a clear log message. No DB row is created.
+
+**Layer 2 — upload endpoint size guard.** `POST /receipts/upload` rejects too-small files with HTTP 400 naming the file. Mirrors layer 1 for manual uploads.
+
+**Layer 3 — worker post-OCR guard.** When OCR returns no vendor AND no amount, the worker now sets the expense to `review_required` with `review_reason=extraction_empty` and **skips dedup + Zoho**. Previously a blank extraction could match an existing Zoho expense by reference number and auto-link to it, creating ghost "Completed" cards.
+
+Affected setup: multi-function scanners (e.g. Kodak S2080W) that produce multi-page batches including blank pages. The size guard catches those at ingest; the worker guard is a safety net for non-blank-but-unreadable scans that slip through.
+
+New env var (optional):
+
+```
+MIN_RECEIPT_SIZE_BYTES=5120     # default; set higher/lower to tune
+                                # set to 0 to disable the size guards entirely
+```
+
+New i18n entry shows "OCR couldn't read vendor or amount. Delete or re-upload." on flagged cards.
+
+**Operator action required after upgrade:** delete any pre-existing ghost expense rows (status=completed, vendor=NULL, amount=NULL, review_reason=linked_to_existing). They were created by the bug this release fixes. Sample cleanup SQL:
+
+```sql
+DELETE FROM expenses
+WHERE vendor IS NULL AND amount IS NULL
+  AND review_reason = 'linked_to_existing';
+DELETE FROM receipts
+WHERE id NOT IN (SELECT receipt_id FROM expenses WHERE receipt_id IS NOT NULL)
+  AND id NOT IN (SELECT receipt_id FROM delivery_notes WHERE receipt_id IS NOT NULL)
+  AND id NOT IN (SELECT receipt_id FROM vendor_invoices WHERE receipt_id IS NOT NULL);
+```
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.7-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.6-saas — 2026-05-28
 
 History cards now show the original source filename below the status pill, so operators can identify which uploaded file produced any record — especially flagged-for-review ones.
 
