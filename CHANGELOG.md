@@ -6,7 +6,55 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.4-saas — 2026-05-28  *(current — recommended to pin)*
+## v1.4.6-saas — 2026-05-28  *(current — recommended to pin)*
+
+History cards now show the original source filename below the status pill, so operators can identify which uploaded file produced any record — especially flagged-for-review ones.
+
+```
+📄 ✅ Completed
+📎 invoice-acme-2026-05-28.pdf       ← NEW
+Acme Co — $1,234.56
+...
+```
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.6-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.5-saas — 2026-05-28
+
+Auto-scan ingest now supports per-folder paid-through routing. Each subfolder of `SCAN_ROOT` declared in the new `SCAN_FOLDER_ACCOUNT_MAP` env var maps to a specific `(user, paid_through_account)` tuple. Files dropped there become receipts stamped with that account — no filename prefix required.
+
+```
+SCAN_FOLDER_ACCOUNT_MAP=Milo=milo,Director C/A-Mr Yung;Milo_P=milo,Director C/A-Mr Yung (P);Kobe=kobe,Director C/A-Mr Lau;Kobe_P=kobe,Director C/A-Mr Lau (P)
+```
+
+Use case: a multi-function scanner (e.g. Kodak S2080W) is configured with one scan function per (director, account), depositing into the matching subfolder.
+
+- Mapped subfolders are **receipt-only** (DN/VI keep using filename prefixes at root)
+- Each mapped subfolder gets its own `_processed/` and `_failed/` archive
+- Root-level behaviour and existing `expense_*` / `dn_*` / `bill_*` filename routing are unchanged
+- Unmapped subfolders are silently skipped (no recursion)
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.5-saas
+# Add SCAN_FOLDER_ACCOUNT_MAP=...
+# Create the matching directories under SCAN_ROOT
+bash install.sh --update
+```
+
+---
+
+## v1.4.4-saas — 2026-05-28
+
+*(superseded by v1.4.5+ — same multi-account mapping carries forward.)*
 
 Multi-account-per-user paid-through mapping. Directors who manage two business accounts (e.g. `Director C/A-Mr Yung` and `Director C/A-Mr Yung (P)`) can now declare both in `PAID_THROUGH_ACCOUNT_MAP` and pick between them per upload.
 
