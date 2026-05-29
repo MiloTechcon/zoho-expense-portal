@@ -6,7 +6,33 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.7-saas — 2026-05-29  *(current — recommended to pin)*
+## v1.4.8-saas — 2026-05-29  *(current — recommended to pin)*
+
+Hotfix: truncate Zoho's `description` field to its 500-character cap before submission.
+
+OCR-extracted line-item lists on long receipts (typically supermarket / parts-list scans) can push the constructed description past Zoho's limit, causing Zoho to reject the POST with HTTP 400 and the expense to land as `failed`. The worker now truncates to 499 characters and appends an ellipsis (`…`) so the cut is visible in Zoho.
+
+**Operator action after upgrade — retry the failed records:**
+
+```sql
+UPDATE expenses
+SET status = 'pending', error_message = NULL
+WHERE status = 'failed'
+  AND error_message LIKE '%Description%has less than 500 characters%';
+```
+
+The worker will pick them up on the next poll tick (default 5 s), re-OCR, truncate, and submit successfully. Or click **Retry** on each failed card individually.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.8-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.7-saas — 2026-05-29
 
 Empty-extraction guard. Three layers of protection against blank or unreadable scans polluting history by auto-linking to wrong Zoho expenses.
 
