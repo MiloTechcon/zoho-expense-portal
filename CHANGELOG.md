@@ -6,7 +6,33 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.12-saas — 2026-06-08  *(current — recommended to pin)*
+## v1.4.13-saas — 2026-06-08  *(current — recommended to pin)*
+
+Fix: receipts with itemised line items no longer fail.
+
+Some receipts (e.g. restaurant bills with a list of dishes) made the model return line items as structured objects rather than plain text, which crashed expense creation with an internal "expected str instance, dict found" error and left the card `failed`. Line items are now normalised to readable text (`item name (price)`) before the expense is built.
+
+Line items remain **best-effort**: they're included in the Zoho description when they read cleanly, but can never crash or bloat an expense — the vendor, amount and date are what matter, and the original receipt image is always attached to the Zoho expense for full detail. (The 500-character description cap from v1.4.8 still applies.)
+
+**Operator action after upgrade — retry the affected records:**
+
+```sql
+UPDATE expenses
+SET status = 'pending', error_message = NULL
+WHERE status = 'failed'
+  AND error_message LIKE '%expected str instance%';
+```
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.13-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.12-saas — 2026-06-08
 
 Receipt OCR: automatically retry an empty read once.
 
