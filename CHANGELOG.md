@@ -6,7 +6,35 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.11-saas — 2026-06-08  *(current — recommended to pin)*
+## v1.4.12-saas — 2026-06-08  *(current — recommended to pin)*
+
+Receipt OCR: automatically retry an empty read once.
+
+A follow-up to v1.4.11. On CPU-only Ollama hosts the model occasionally returns a blank read for a perfectly legible receipt — observed as 1 of 4 identical-format telephone bills landing as "Unknown – $0.00 / Needs review". When OCR returns no vendor **and** no amount, the worker now **re-runs the extraction once** before flagging the card; the second pass almost always succeeds.
+
+Genuinely blank or unreadable scans stay empty on the retry and still go to **Needs review** as before, so nothing wrong gets auto-created. Operator-forced "create anyway" retries skip the extra pass.
+
+> Still the durable fix for OCR speed and reliability: run Ollama on a host with a supported GPU. The retry is a safety net over slow CPU inference, not a substitute for it.
+
+**Operator action after upgrade — retry the affected records:**
+
+```sql
+UPDATE expenses
+SET status = 'pending', error_message = NULL
+WHERE status IN ('failed', 'review_required')
+  AND (vendor IS NULL OR amount IS NULL OR amount = 0);
+```
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.12-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.11-saas — 2026-06-08
 
 Receipt OCR: render page 1 only, and raise the output budget.
 
