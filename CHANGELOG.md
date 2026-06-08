@@ -6,7 +6,81 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.8-saas — 2026-05-29  *(current — recommended to pin)*
+## v1.4.11-saas — 2026-06-08  *(current — recommended to pin)*
+
+Receipt OCR: render page 1 only, and raise the output budget.
+
+On CPU-only Ollama hosts (no supported GPU), a 2-page receipt PDF took several minutes per document, and the scanner's usually-blank second page could crowd the model's context and blank out the extraction — leaving "Unknown – $0.00" cards. Receipts now send **only the first page** to the model (halving inference time and freeing context), and the output token budget is raised so receipts with long line-item lists no longer get their JSON cut off mid-output (which previously produced an empty extraction).
+
+Delivery notes and vendor invoices are unchanged — they still process up to two pages, since those documents are legitimately multi-page.
+
+> Tip: for acceptable OCR speed, run Ollama on a host with a supported GPU. Stock Ollama accelerates NVIDIA (CUDA), AMD (ROCm), and Apple (Metal); pure-CPU inference of a 7–8B vision model is slow regardless of this change.
+
+**Operator action after upgrade — retry the affected records:**
+
+```sql
+UPDATE expenses
+SET status = 'pending', error_message = NULL
+WHERE status IN ('failed', 'review_required')
+  AND (vendor IS NULL OR amount IS NULL OR amount = 0);
+```
+
+The worker re-OCRs them on the next poll tick. Or click **Retry** on each card.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.11-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.10-saas — 2026-06-08
+
+In-app license import & renewal — no more `.env` editing to renew.
+
+Renew your license straight from the web UI. A new **License** page (🔑 in the top bar) shows who the license is issued to, the expiry date, and days remaining, and lets you **paste a renewed key and import it** — it's stored in the database and takes effect automatically, with no `.env` edit and no manual restart.
+
+An **expiry warning banner** now appears on every page within 14 days of expiry (turning red in the final 3 days), so renewals never lapse silently.
+
+At startup the app uses whichever **valid license lasts longest** between the stored (imported) key and the `LICENSE_KEY` in your `.env`, so coverage never moves backwards. Import only accepts a key that extends your current coverage.
+
+New env var (optional):
+
+```
+LICENSE_WARN_DAYS=14     # days before expiry to start showing the banner
+```
+
+No compose change — the imported license persists in the existing Postgres volume. Your existing `.env` `LICENSE_KEY` keeps working as the bootstrap license; future renewals can go through the UI.
+
+> Renew **before** expiry. If a license fully lapses the app stops (as before) and the import page is unreachable — the banner is there to prevent that.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.10-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.9-saas — 2026-06-08
+
+Accept TIFF scans.
+
+`.tif` / `.tiff` images are now accepted for both manual upload and scan-folder ingestion, alongside the existing PDF / JPEG / PNG formats — useful for multi-function scanners that output TIFF by default.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.9-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.8-saas — 2026-05-29
 
 Hotfix: truncate Zoho's `description` field to its 500-character cap before submission.
 
