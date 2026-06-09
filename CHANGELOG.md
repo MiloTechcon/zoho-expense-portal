@@ -6,7 +6,24 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.13-saas — 2026-06-08  *(current — recommended to pin)*
+## v1.4.14-saas — 2026-06-09  *(current — recommended to pin)*
+
+History view: scrollable, fixed-height list.
+
+The history page used to be one long, ever-growing page — to reach the footer (and the app version shown there) you had to scroll past every record, which was awkward on mobile. The list now sits in a **fixed-height box that scrolls on its own**, loading more cards as you scroll to the bottom. The page itself stays short, so the footer and version are always one glance away.
+
+Filter changes jump back to the top; the auto-refresh of in-progress items keeps your scroll position. No data or settings change — purely a view improvement.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.14-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.13-saas — 2026-06-08
 
 Fix: receipts with itemised line items no longer fail.
 
