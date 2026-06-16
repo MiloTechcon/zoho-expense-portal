@@ -6,7 +6,59 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.14-saas — 2026-06-09  *(current — recommended to pin)*
+## v1.4.16-saas — 2026-06-16  *(current — recommended to pin)*
+
+Future-dated receipts are flagged for review (with a timezone-safe grace).
+
+A follow-up to v1.4.15's date checks. Receipts whose OCR-read date lands in the future (typically a wrong-year mis-read) are flagged for verification instead of being booked. Because "today" is measured in UTC and you operate in UTC+8, a small grace (`EXPENSE_FUTURE_GRACE_DAYS`, default 1 day) prevents a legitimate same-day receipt scanned in the early morning from being wrongly flagged, while genuine far-future mis-reads still get caught.
+
+New env var (optional):
+
+```
+EXPENSE_FUTURE_GRACE_DAYS=1     # days past today allowed before flagging a future date
+```
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.16-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.15-saas — 2026-06-16
+
+Extraction plausibility checks — catch OCR mis-reads before they reach Zoho.
+
+Two new safeguards flag a receipt for **Needs review** (instead of booking a wrong figure), and a **Cancel** button to drop anything you don't want:
+
+- **Learned amount check.** For each vendor, the system learns the normal range from *your own* past expenses. If a new receipt's amount falls well outside that vendor's usual range — too high *or* too low (a dropped or added digit) — it's flagged. It's deliberately lenient at first and gets more precise the more times it has seen a vendor (it needs at least a handful of past expenses before it judges anything; brand-new vendors are never flagged on amount).
+- **Date floor.** A receipt dated before your company start date is flagged. Set it with `EXPENSE_MIN_DATE` (e.g. `2024-08-15`); leave blank to disable.
+- **Cancel on review cards.** Every Needs-review item (receipt, delivery note, vendor invoice) now has a **Cancel** button that drops it and deletes the scan — which also clears the duplicate lock, so you can re-scan and re-submit it cleanly later.
+
+New env vars (all optional, sensible defaults):
+
+```
+EXPENSE_MIN_DATE=2024-08-15            # date floor; blank = off
+AMOUNT_OUTLIER_ENABLED=true
+AMOUNT_OUTLIER_MIN_SAMPLES=5           # past expenses needed before judging a vendor
+AMOUNT_OUTLIER_IQR_FACTOR=2.5          # higher = more tolerant
+AMOUNT_OUTLIER_MIN_TOLERANCE_PCT=40
+```
+
+Flagged amounts show the learned range, e.g. *"This vendor's past expenses were $230–$310; this reads $520. Please verify the amount."* Confirm with **Create new anyway**, or **Cancel** to drop it.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.15-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.14-saas — 2026-06-09
 
 History view: scrollable, fixed-height list.
 
