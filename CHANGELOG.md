@@ -6,7 +6,41 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.16-saas — 2026-06-16  *(current — recommended to pin)*
+## v1.4.17-saas — 2026-06-18  *(current — recommended to pin)*
+
+Email notifications for items that need your attention.
+
+When a receipt fails to process, or is flagged for review (empty/unreadable scan, possible duplicate, an unusual amount, or an out-of-range date), the portal now **emails the responsible director** with a link straight to the history page to verify-and-complete or cancel it — so nothing waits unnoticed. Exactly one email is sent per item (no repeats on every poll), via the Resend email service.
+
+Emails go to the **owner** of the item (the director who uploaded it), with a fallback address for scanner-ingested items. Set each director's email with the admin CLI.
+
+New env vars:
+
+```
+RESEND_API_KEY=re_...                       # from your Resend account
+EMAIL_FROM=alerts@your-domain.com           # a Resend-verified sender
+APP_BASE_URL=https://your-portal-url        # used for the link in the email
+REVIEW_NOTIFY_EMAIL=fallback@your-domain.com  # optional; for items with no owner
+```
+
+After upgrading, set the directors' email addresses:
+
+```bash
+docker compose exec zoho-expense-web python /app/run_manage.py set-email <username> <email>
+```
+
+If `RESEND_API_KEY` is left blank, the feature is simply off — existing deployments are unaffected.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.17-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.16-saas — 2026-06-16
 
 Future-dated receipts are flagged for review (with a timezone-safe grace).
 
