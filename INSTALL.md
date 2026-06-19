@@ -137,7 +137,34 @@ Filename conventions:
 
 Restart after editing `.env`: `bash install.sh --update`.
 
-## 9. Updates
+## 9. Email notifications (optional)
+
+The portal can email the responsible director whenever an item lands in **Needs review** or **Failed** — an unreadable/blank scan, a possible duplicate, an unusual amount, an out-of-range date, or a processing error — with a link straight to the history page so nothing waits unnoticed. It sends through [Resend](https://resend.com).
+
+1. Create a Resend account, **verify a sending domain** (e.g. `techcon-solution.com`), and create an API key.
+2. In `.env`:
+
+   ```env
+   RESEND_API_KEY=re_xxxxxxxx
+   EMAIL_FROM=alerts@techcon-solution.com       # an address on your verified domain
+   APP_BASE_URL=https://your-portal-url          # used for the link in the email
+   # REVIEW_NOTIFY_EMAIL=ops@techcon-solution.com  # optional fallback for scanner items with no owner
+   ```
+
+3. Apply, then set each director's email address:
+
+   ```bash
+   bash install.sh --update
+   docker compose exec web python /app/run_manage.py set-email <username> <email>
+   ```
+
+   Confirm with `docker compose exec web python /app/run_manage.py list-users` — the email column should show.
+
+One email is sent per item (no repeats on every poll). Emails go to the item's **owner** (the director who uploaded it); scanner-ingested items with no owner fall back to `REVIEW_NOTIFY_EMAIL`. Leaving `RESEND_API_KEY` blank keeps notifications off.
+
+> Until your domain is verified in Resend you can test with `EMAIL_FROM=onboarding@resend.dev`.
+
+## 10. Updates
 
 ```bash
 # 1. Edit .env: change APP_VERSION_TAG to the new version
@@ -149,7 +176,7 @@ Database state (the `pgdata` volume) is preserved across upgrades. Idempotent mi
 
 To roll back, change the tag back to the previous version and run the same command.
 
-## 10. Backup
+## 11. Backup
 
 The only persistent state is the `pgdata` Docker volume. Receipt images are stored as bytea inside Postgres, so a SQL dump includes them.
 
@@ -163,7 +190,7 @@ To restore:
 cat backup-YYYYMMDD.sql | docker compose exec -T db psql -U postgres expenses
 ```
 
-## 11. Common issues
+## 12. Common issues
 
 ### Login to ghcr.io fails
 
@@ -188,6 +215,13 @@ Confirm `ollama serve` is running on the host (`ollama list` should work). The p
 ### Worker keeps logging "Failed to extract data from receipt"
 
 Usually an Ollama issue. Check `docker compose logs worker` for the upstream error from Ollama (image too large, OOM, etc.). The portal logs the raw model output when parsing fails so you can see what went wrong.
+
+### Notification emails not arriving
+
+- Confirm `RESEND_API_KEY` and `EMAIL_FROM` are set in `.env` and the containers were restarted (`bash install.sh --update`).
+- `EMAIL_FROM` must be on a **Resend-verified domain** — an unverified sender is rejected. Test with `EMAIL_FROM=onboarding@resend.dev` first.
+- Set the recipient: `docker compose exec web python /app/run_manage.py set-email <username> <email>` (check with `list-users`). Items with no owner need `REVIEW_NOTIFY_EMAIL` set.
+- Check `docker compose logs worker | grep notify` for send errors (the worker logs the Resend response on failure).
 
 ## Uninstall
 
