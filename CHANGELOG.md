@@ -6,7 +6,24 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.17-saas — 2026-06-18  *(current — recommended to pin)*
+## v1.4.18-saas — 2026-06-27  *(current — recommended to pin)*
+
+Vendor invoices with no due date now process automatically.
+
+A vendor invoice that shows no printed due date and no payment terms (e.g. "Net 30") used to stop in **Needs review** as "Due date missing". It now defaults the due date to the **invoice date** — i.e. due on the invoice date — and creates the Zoho bill anyway, so nothing waits for manual entry. Review is now reserved only for the rare case where the invoice has no usable date at all.
+
+No configuration change. For an invoice already parked for this reason, click **Retry** on its card after upgrading and it will go through.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.18-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.17-saas — 2026-06-18
 
 Email notifications for items that need your attention.
 
