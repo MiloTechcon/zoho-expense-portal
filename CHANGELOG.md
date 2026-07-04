@@ -6,7 +6,28 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.18-saas — 2026-06-27  *(current — recommended to pin)*
+## v1.4.19-saas — 2026-07-05  *(current — recommended to pin)*
+
+Fixes the review card for vendor invoices whose **invoice date** couldn't be read.
+
+Since v1.4.18, a vendor invoice only stops in **Needs review** for a date problem when the invoice date itself is missing — but the card still said "Due date missing" and asked for a due date, which could never complete (creating a Zoho bill requires the invoice date). Now:
+
+- The reason reads **"Invoice date missing"** (EN/中文), matching what actually went wrong.
+- The card asks for the **invoice date**. Enter it and click **Convert to Bill** — if the invoice printed no due date either, the due date defaults to the date you entered (same rule as automatic processing), and the bill is created.
+- Invoices parked as "Due date missing" before v1.4.18 still work exactly as before.
+
+No configuration change.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.19-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.18-saas — 2026-06-27
 
 Vendor invoices with no due date now process automatically.
 
