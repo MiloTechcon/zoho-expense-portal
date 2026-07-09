@@ -6,7 +6,24 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.19-saas — 2026-07-05  *(current — recommended to pin)*
+## v1.4.20-saas — 2026-07-09  *(current — recommended to pin)*
+
+Manual **Convert to Bill** no longer refuses invoices with no due date.
+
+If a vendor invoice stopped in **Needs review** before automatic processing reached its due-date step (PO not matched, missing bill number, or an amount mismatch), clicking **Convert to Bill** failed with *"No due date — call /set-due-date first"*. Manual conversion now applies the same rule as automatic processing: with no printed due date, the bill is **due on the invoice date**, and conversion proceeds. It only stops if the invoice date itself is unknown — in which case the card asks you for it.
+
+No configuration change. If an invoice is stuck with this error, just click **Convert to Bill** again after upgrading.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.20-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.19-saas — 2026-07-05
 
 Fixes the review card for vendor invoices whose **invoice date** couldn't be read.
 
