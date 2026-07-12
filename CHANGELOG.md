@@ -6,7 +6,24 @@ The pinned image version is whichever tag you set in `APP_VERSION_TAG` in your `
 
 ---
 
-## v1.4.20-saas — 2026-07-09  *(current — recommended to pin)*
+## v1.4.21-saas — 2026-07-13  *(current — recommended to pin)*
+
+New logo and app icons.
+
+The portal now uses the Techcon Solution receipt-and-calculator artwork everywhere: browser tab favicon, iPhone/Android home-screen icons, and the navigation-bar logo. Purely cosmetic — no behavior or configuration change.
+
+Tip: browsers cache favicons aggressively; if the tab still shows the old icon after upgrading, hard-refresh or clear the site's cached images.
+
+Apply with:
+
+```bash
+# In .env:  APP_VERSION_TAG=v1.4.21-saas
+bash install.sh --update
+```
+
+---
+
+## v1.4.20-saas — 2026-07-09
 
 Manual **Convert to Bill** no longer refuses invoices with no due date.
 
